@@ -14,5 +14,5 @@ import { ToolbarComponent } from "./pages/shared/toolbar.component";
   styles: [],
 })
 export class AppComponent {
-  title = 'ngNduka';
+  title = 'bitu-yetu';
 }

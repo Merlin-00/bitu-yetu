@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngNduka": {
+    "bitu-yetu": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -41,7 +41,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/ng-nduka",
+            "outputPath": "dist/bitu-yetu",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -93,10 +93,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ngNduka:build:production"
+              "buildTarget": "bitu-yetu:build:production"
             },
             "development": {
-              "buildTarget": "ngNduka:build:development"
+              "buildTarget": "bitu-yetu:build:development"
             }
           },
           "defaultConfiguration": "development"
