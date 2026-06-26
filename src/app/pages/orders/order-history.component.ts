@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -27,7 +27,7 @@ import { Subscription } from 'rxjs';
             height="80px"
             viewBox="0 -960 960 960"
             width="80px"
-            fill="#cbd5e1"
+            fill="var(--text-muted)"
           >
             <path
               d="m384-336 240-240-57-56-183 183-87-87-57 56 144 144Zm96 256q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"
@@ -39,7 +39,7 @@ import { Subscription } from 'rxjs';
         </div>
       } @else {
         <div class="orders-list">
-          @for (order of orders(); track order.id) {
+          @for (order of paginatedOrders(); track order.id) {
             <div class="order-card" [class.expanded]="expandedOrderId() === order.id">
               <!-- Card Header Summary -->
               <div class="order-header" (click)="toggleExpand(order.id!)">
@@ -58,7 +58,7 @@ import { Subscription } from 'rxjs';
                     height="24px"
                     viewBox="0 -960 960 960"
                     width="24px"
-                    fill="#64748b"
+                    fill="var(--text-main)"
                   >
                     <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
                   </svg>
@@ -106,26 +106,58 @@ import { Subscription } from 'rxjs';
             </div>
           }
         </div>
+
+        <!-- Pagination Controls -->
+        @if (totalPages() > 1) {
+          <div class="pagination-controls">
+            <button 
+              class="pag-btn" 
+              [disabled]="currentPage() === 1" 
+              (click)="prevPage()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+                <path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/>
+              </svg>
+              Précédent
+            </button>
+            
+            <span class="page-info">
+              Page {{ currentPage() }} sur {{ totalPages() }}
+            </span>
+            
+            <button 
+              class="pag-btn" 
+              [disabled]="currentPage() === totalPages()" 
+              (click)="nextPage()"
+            >
+              Suivant
+              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+                <path d="M379-244 323-300l180-180-180-180 56-56 236 236-236 236Z"/>
+              </svg>
+            </button>
+          </div>
+        }
       }
     </main>
   `,
   styles: `
     .orders-page {
-      padding: 2.5rem 1rem;
+      padding: 3rem 1rem;
       min-height: calc(100vh - 120px);
     }
 
     .page-header {
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
       h2 {
         margin: 0;
         font-size: 1.8rem;
-        font-weight: 800;
-        color: #0f172a;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: 0.05em;
       }
       .subtitle {
-        margin: 0.4rem 0 0;
-        color: #64748b;
+        margin: 0.5rem 0 0;
+        color: var(--text-muted);
         font-size: 0.95rem;
       }
     }
@@ -135,16 +167,16 @@ import { Subscription } from 'rxjs';
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 5rem 0;
-      color: #64748b;
+      gap: 16px;
+      padding: 6rem 0;
+      color: var(--text-muted);
     }
 
     .spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid #e2e8f0;
-      border-top-color: #4f46e5;
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border-light);
+      border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -159,65 +191,110 @@ import { Subscription } from 'rxjs';
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 5rem 1rem;
-      color: #64748b;
+      padding: 6rem 1rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      background: var(--bg-sub);
 
       h3 {
         margin: 1.5rem 0 0.5rem;
-        color: #0f172a;
-        font-size: 1.3rem;
+        color: var(--text-main);
+        font-size: 1.4rem;
         font-weight: 700;
       }
 
       p {
         margin-bottom: 2rem;
+        font-size: 0.95rem;
       }
     }
 
     .shop-btn {
-      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      background: var(--primary);
       color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
+      border: 1px solid var(--primary);
+      padding: 0.75rem 2rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+
+      &:hover {
+        background: var(--primary-hover);
+      }
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .pag-btn {
+      background: var(--bg-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-light);
+      padding: 0.5rem 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+
+      &:hover:not(:disabled) {
+        background: var(--primary);
+        color: var(--bg-main);
+        border-color: var(--primary);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    .page-info {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
     }
 
     /* Orders List & Cards */
     .orders-list {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
     .order-card {
-      background: #ffffff;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+      background: var(--bg-sub);
+      border: 1px solid var(--border-light);
+      border-radius: 0px;
       overflow: hidden;
-      transition: all 0.25s;
+      transition: all 0.2s ease-in-out;
 
       &:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border-color: var(--primary);
       }
 
       &.expanded {
-        border-color: #4f46e5;
-        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.06);
+        border-color: var(--primary);
 
         .chevron-icon {
           transform: rotate(180deg);
-          fill: #4f46e5;
         }
       }
     }
 
     .order-header {
-      padding: 1.25rem 1.5rem;
+      padding: 1.5rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -230,54 +307,56 @@ import { Subscription } from 'rxjs';
     .header-main-info {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
 
       .order-ref {
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 700;
-        color: #0f172a;
+        color: var(--text-main);
+        letter-spacing: 0.02em;
       }
 
       .order-date {
         font-size: 0.8rem;
-        color: #64748b;
+        color: var(--text-muted);
       }
     }
 
     .header-sub-info {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 2rem;
 
       .order-total {
         font-size: 1.1rem;
         font-weight: 800;
-        color: #4f46e5;
+        color: var(--text-main);
       }
 
       .order-badge {
         font-size: 0.75rem;
         font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 50px;
-        text-transform: uppercase;
+        padding: 4px 12px;
+        letter-spacing: 0.05em;
+        background: var(--primary);
+        color: white;
 
         &.paid {
-          background: rgba(34, 197, 94, 0.1);
-          color: #166534;
+          background: var(--primary);
+          color: white;
         }
       }
 
       .chevron-icon {
-        transition: transform 0.2s ease-in-out;
+        transition: transform 0.25s ease-in-out;
       }
     }
 
     /* Details body */
     .order-details-body {
-      padding: 1.5rem;
-      background: #f8fafc;
-      border-top: 1px solid #f1f5f9;
+      padding: 2rem;
+      background: var(--bg-main);
+      border-top: 1px solid var(--border-light);
       animation: expandIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -295,10 +374,10 @@ import { Subscription } from 'rxjs';
     .details-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 2.5rem;
 
       @media (min-width: 768px) {
-        grid-template-columns: 1.5fr 1fr;
+        grid-template-columns: 1.4fr 1fr;
       }
     }
 
@@ -307,11 +386,10 @@ import { Subscription } from 'rxjs';
       flex-direction: column;
 
       h5 {
-        margin: 0 0 1rem 0;
-        font-size: 0.9rem;
+        margin: 0 0 1.25rem 0;
+        font-size: 0.8rem;
         font-weight: 700;
-        color: #475569;
-        text-transform: uppercase;
+        color: var(--text-main);
         letter-spacing: 0.05em;
       }
     }
@@ -319,15 +397,15 @@ import { Subscription } from 'rxjs';
     .items-list {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 1rem;
     }
 
     .product-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid #e2e8f0;
+      gap: 14px;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
 
       &:last-child {
         border-bottom: none;
@@ -335,13 +413,12 @@ import { Subscription } from 'rxjs';
       }
 
       .prod-img {
-        width: 38px;
-        height: 38px;
+        width: 44px;
+        height: 44px;
         object-fit: contain;
         background: white;
-        border-radius: 4px;
-        padding: 2px;
-        border: 1px solid #e2e8f0;
+        padding: 4px;
+        border: 1px solid var(--border-light);
         flex-shrink: 0;
       }
 
@@ -352,24 +429,24 @@ import { Subscription } from 'rxjs';
         min-width: 0;
 
         .prod-title {
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           font-weight: 600;
-          color: #334155;
+          color: var(--text-main);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .prod-price {
-          font-size: 0.75rem;
-          color: #64748b;
+          font-size: 0.8rem;
+          color: var(--text-muted);
         }
       }
 
       .prod-total {
         font-size: 0.85rem;
         font-weight: 700;
-        color: #0f172a;
+        color: var(--text-main);
       }
     }
 
@@ -378,26 +455,24 @@ import { Subscription } from 'rxjs';
       flex-direction: column;
 
       h5 {
-        margin: 0 0 1rem 0;
-        font-size: 0.9rem;
+        margin: 0 0 1.25rem 0;
+        font-size: 0.8rem;
         font-weight: 700;
-        color: #475569;
-        text-transform: uppercase;
+        color: var(--text-main);
         letter-spacing: 0.05em;
       }
     }
 
     .address-box {
       background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 1rem;
+      border: 1px solid var(--border-light);
+      padding: 1.25rem;
       font-size: 0.85rem;
-      color: #475569;
-      line-height: 1.5;
+      color: var(--text-muted);
+      line-height: 1.6;
 
       p {
-        margin: 0 0 4px;
+        margin: 0 0 6px;
         &:last-child {
           margin-bottom: 0;
         }
@@ -405,13 +480,16 @@ import { Subscription } from 'rxjs';
 
       .name {
         font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 6px;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
       }
 
       .phone {
-        margin-top: 6px;
+        margin-top: 8px;
         font-weight: 500;
+        color: var(--text-main);
       }
     }
   `,
@@ -421,26 +499,56 @@ export default class OrderHistoryComponent implements OnInit {
   loading = signal(true);
   expandedOrderId = signal<string | null>(null);
 
+  currentPage = signal(1);
+  pageSize = 5;
+
+  paginatedOrders = computed(() => {
+    const allOrders = this.orders();
+    const startIndex = (this.currentPage() - 1) * this.pageSize;
+    return allOrders.slice(startIndex, startIndex + this.pageSize);
+  });
+
+  totalPages = computed(() => {
+    return Math.ceil(this.orders().length / this.pageSize) || 1;
+  });
+
   private orderService = inject(OrderService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private ordersSub?: Subscription;
 
-  ngOnInit() {
-    const user = this.authService.currentUser();
-    if (!user) {
-      this.router.navigate(['/auth'], {
-        queryParams: { returnUrl: '/orders' },
-      });
-      return;
-    }
+  constructor() {
+    effect(() => {
+      const loading = this.authService.loading();
+      const user = this.authService.currentUser();
+      if (!loading) {
+        if (!user) {
+          this.router.navigate(['/auth'], {
+            queryParams: { returnUrl: '/orders' },
+          });
+        } else {
+          // start subscribing to orders if not already subscribed
+          if (!this.ordersSub) {
+            this.subscribeToOrders(user.uid);
+          }
+        }
+      }
+    });
+  }
 
-    this.ordersSub = this.orderService.getUserOrders(user.uid).subscribe({
+  ngOnInit() {
+    // Left empty since active auth check and loading is reactive in effect() inside constructor
+  }
+
+  subscribeToOrders(userId: string) {
+    this.ordersSub = this.orderService.getUserOrders(userId).subscribe({
       next: (ordersList) => {
         this.orders.set(ordersList);
+        this.currentPage.set(1); // Reset page to 1
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        console.error("Erreur de chargement de l'historique des commandes:", err);
         this.loading.set(false);
       },
     });
@@ -464,6 +572,24 @@ export default class OrderHistoryComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(page => page + 1);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(page => page - 1);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
   }
 
   goToHome() {

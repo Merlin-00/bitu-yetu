@@ -1,14 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #4f46e5;
-  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-  --secondary-gradient: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-light: rgba(226, 232, 240, 0.8);
-  --bg-main: #ffffff;
-  --bg-sub: #f8fafc;
+  --primary: #111111;
+  --primary-hover: #2d2d2d;
+  --primary-gradient: #111111;
+  --secondary-gradient: #111111;
+  --text-main: #111111;
+  --text-muted: #666666;
+  --border-light: #e2ded5;
+  --bg-main: #FAF9F5; /* Beautiful soft warm beige cream background */
+  --bg-sub: #f3efe6;  /* Deeper beige for panels, cards, and sub-blocks */
+  --accent-beige: #e9e4d9;
 }
 
 html,
@@ -28,29 +30,30 @@ body {
   padding: 0 1rem;
 }
 
-/* Elegant scrollbar styling */
+/* Elegant minimalist scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-main);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-light);
   border-radius: 99px;
   
   &:hover {
-    background: #94a3b8;
+    background: var(--text-muted);
   }
 }
 
 button {
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0px; /* Sharp corners for modern architectural layout */
+  transition: all 0.2s ease-in-out;
 
   &:disabled {
     cursor: not-allowed;
@@ -60,10 +63,15 @@ button {
 a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 /* Form resets */
 input, select, textarea {
   font-family: inherit;
 }
+

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
@@ -40,7 +40,7 @@ import { FormsModule } from '@angular/forms';
                 height="20px"
                 viewBox="0 -960 960 960"
                 width="20px"
-                fill="#ef4444"
+                fill="#b91c1c"
               >
                 <path
                   d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"
@@ -120,7 +120,7 @@ import { FormsModule } from '@angular/forms';
           [disabled]="authLoading()"
           class="google-button"
         >
-          <svg class="google-icon" viewBox="0 0 24 24" width="20px" height="20px">
+          <svg class="google-icon" viewBox="0 0 24 24" width="18px" height="18px">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -153,12 +153,10 @@ import { FormsModule } from '@angular/forms';
     }
 
     .auth-card {
-      background: #ffffff;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      border-radius: 24px;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 15px 20px -20px rgba(0, 0, 0, 0.05);
+      background: var(--bg-main);
+      border: 1px solid var(--border-light);
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       padding: 2.5rem;
       box-sizing: border-box;
       animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -167,7 +165,7 @@ import { FormsModule } from '@angular/forms';
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(10px);
       }
       to {
         opacity: 1;
@@ -181,23 +179,24 @@ import { FormsModule } from '@angular/forms';
 
       h2 {
         margin: 0;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--text-main);
+        letter-spacing: -0.01em;
       }
 
       .subtitle {
         margin: 0.5rem 0 1.5rem;
-        font-size: 0.9rem;
-        color: #64748b;
+        font-size: 0.85rem;
+        color: var(--text-muted);
       }
     }
 
     .tab-switcher {
       display: flex;
-      background: #f1f5f9;
+      background: var(--bg-sub);
+      border: 1px solid var(--border-light);
       padding: 4px;
-      border-radius: 12px;
     }
 
     .tab-btn {
@@ -205,23 +204,20 @@ import { FormsModule } from '@angular/forms';
       border: none;
       background: transparent;
       padding: 8px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: #64748b;
-      border-radius: 8px;
+      color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s;
 
       &.active {
-        background: #ffffff;
-        color: #4f46e5;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        background: var(--bg-main);
+        color: var(--text-main);
+        border: 1px solid var(--border-light);
       }
 
       &:hover:not(.active) {
-        color: #0f172a;
-        scale: 1;
-        opacity: 1;
+        color: var(--text-main);
       }
     }
 
@@ -234,13 +230,12 @@ import { FormsModule } from '@angular/forms';
     .error-banner {
       background: #fef2f2;
       border: 1px solid #fee2e2;
-      border-radius: 12px;
       padding: 10px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
       color: #991b1b;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
     }
 
@@ -250,40 +245,40 @@ import { FormsModule } from '@angular/forms';
       gap: 6px;
 
       label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
       }
     }
 
     .form-input {
       width: 100%;
-      height: 44px;
+      height: 42px;
       padding: 0 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      font-size: 0.9rem;
+      border: 1px solid var(--border-light);
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-size: 0.85rem;
       outline: none;
       box-sizing: border-box;
       transition: all 0.2s;
       font-family: inherit;
 
       &:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        border-color: var(--primary);
       }
     }
 
     .submit-button {
-      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-      color: white;
-      border: none;
-      height: 46px;
-      border-radius: 12px;
+      background: var(--primary);
+      color: var(--bg-main);
+      border: 1px solid var(--primary);
+      height: 44px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
       transition: all 0.25s;
       display: flex;
       align-items: center;
@@ -292,19 +287,19 @@ import { FormsModule } from '@angular/forms';
       margin-top: 0.5rem;
 
       &:disabled {
-        opacity: 0.7;
+        opacity: 0.5;
         cursor: not-allowed;
       }
 
       &:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
       }
     }
 
     .spinner {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: white;
       border-radius: 50%;
@@ -321,16 +316,16 @@ import { FormsModule } from '@angular/forms';
       display: flex;
       align-items: center;
       text-align: center;
-      color: #94a3b8;
-      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.7rem;
       font-weight: 700;
-      margin: 1.5rem 0;
+      margin: 1.25rem 0;
 
       &::before,
       &::after {
         content: '';
         flex: 1;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-light);
       }
 
       span {
@@ -339,13 +334,12 @@ import { FormsModule } from '@angular/forms';
     }
 
     .google-button {
-      border: 1px solid #e2e8f0;
-      background: white;
-      color: #334155;
-      height: 44px;
-      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-main);
+      color: var(--text-main);
+      height: 42px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -355,14 +349,11 @@ import { FormsModule } from '@angular/forms';
       width: 100%;
 
       &:hover:not(:disabled) {
-        background-color: #f8fafc;
-        border-color: #cbd5e1;
-        opacity: 1;
-        scale: 1;
+        background-color: var(--bg-sub);
       }
 
       &:disabled {
-        opacity: 0.7;
+        opacity: 0.5;
         cursor: not-allowed;
       }
     }
@@ -383,6 +374,18 @@ export default class AuthComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  constructor() {
+    effect(() => {
+      const user = this.authService.currentUser();
+      const loading = this.authService.loading();
+      if (!loading && user) {
+        // Automatically redirect away if user is already authenticated
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
+      }
+    });
+  }
 
   setTab(isLogin: boolean) {
     this.isLoginTab.set(isLogin);
@@ -440,7 +443,6 @@ export default class AuthComponent {
   }
 
   private handleSuccessRedirect() {
-    // Check if redirect query param exists, else fallback to home or checkout
     const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     this.router.navigateByUrl(returnUrl);
   }
@@ -464,3 +466,4 @@ export default class AuthComponent {
     }
   }
 }
+

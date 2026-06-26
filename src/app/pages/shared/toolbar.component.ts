@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -13,7 +13,7 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
       <div class="toolbar max-width">
         <div class="logo-side">
           <a routerLink="/" class="logo-link">
-            <span class="logo-icon">🚀</span>
+            <span class="logo-icon">🛒</span>
             <h2>bitu-yetu</h2>
           </a>
         </div>
@@ -31,7 +31,7 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
                 height="24px"
                 viewBox="0 -960 960 960"
                 width="24px"
-                fill="#1e293b"
+                fill="#111111"
               >
                 <path
                   d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"
@@ -49,13 +49,17 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
             @if (authService.loading()) {
               <div class="auth-skeleton"></div>
             } @else if (authService.currentUser()) {
-              <div class="user-menu-container" (click)="toggleUserMenu()">
-                <div class="user-avatar">
-                  {{ getUserInitials() }}
+              <div class="user-menu-container" (click)="toggleUserMenu($event)">
+                <div class="user-avatar" [class.has-img]="authService.currentUser()?.photoURL">
+                  @if (authService.currentUser()?.photoURL) {
+                    <img [src]="authService.currentUser()?.photoURL" alt="avatar" class="avatar-img" />
+                  } @else {
+                    {{ getUserInitials() }}
+                  }
                 </div>
                 
                 @if (isUserMenuOpen()) {
-                  <div class="user-dropdown">
+                  <div class="user-dropdown" (click)="preventClose($event)">
                     <div class="dropdown-header">
                       <span class="user-email">{{ authService.currentUser()?.email }}</span>
                     </div>
@@ -86,12 +90,9 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
       position: sticky;
       top: 0;
       z-index: 999;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border-light);
       padding: 0.5rem 1rem;
-      border-bottom: 1px solid rgba(228, 228, 228, 0.6);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
     }
 
     .toolbar {
@@ -113,16 +114,15 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
         gap: 0.5rem;
         
         .logo-icon {
-          font-size: 1.5rem;
+          font-size: 1.3rem;
         }
 
         h2 {
           margin: 0;
-          font-size: 1.3rem;
+          font-size: 1.25rem;
           font-weight: 800;
-          background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: var(--text-main);
+          letter-spacing: -0.03em;
         }
       }
     }
@@ -137,7 +137,7 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
     .actions-side {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
     .cart-container {
@@ -146,11 +146,12 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
       gap: 0.5rem;
       cursor: pointer;
       padding: 6px 12px;
-      border-radius: 12px;
-      transition: background-color 0.2s;
+      border: 1px solid transparent;
+      transition: all 0.2s;
 
       &:hover {
-        background-color: #f1f5f9;
+        background-color: var(--bg-sub);
+        border-color: var(--border-light);
       }
 
       .cart-icon-wrapper {
@@ -163,24 +164,23 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
         position: absolute;
         top: -8px;
         right: -8px;
-        background: #ef4444;
-        color: white;
-        font-size: 0.7rem;
+        background: var(--text-main);
+        color: var(--bg-main);
+        font-size: 0.65rem;
         font-weight: 800;
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border: 1px solid var(--bg-main);
       }
 
       .cart-label {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         font-weight: 600;
-        color: #1e293b;
+        color: var(--text-main);
       }
     }
 
@@ -190,10 +190,11 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
     }
 
     .auth-skeleton {
-      width: 38px;
-      height: 38px;
-      background: #f1f5f9;
+      width: 36px;
+      height: 36px;
+      background: var(--bg-sub);
       border-radius: 50%;
+      border: 1px solid var(--border-light);
       animation: pulse 1.5s infinite ease-in-out;
     }
 
@@ -204,19 +205,17 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
     }
 
     .login-button {
-      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-      color: white !important;
-      padding: 8px 18px;
-      border-radius: 10px;
+      background: var(--primary);
+      color: var(--bg-main) !important;
+      padding: 8px 16px;
       font-weight: 600;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+      font-size: 0.85rem;
+      border: 1px solid var(--primary);
       transition: all 0.2s;
 
       &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
-        opacity: 0.95;
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
       }
     }
 
@@ -226,21 +225,28 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
     }
 
     .user-avatar {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
-      color: white;
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      color: var(--bg-main);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.95rem;
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
-      transition: transform 0.2s;
+      font-size: 0.85rem;
+      border: 1px solid var(--primary);
+      overflow: hidden;
 
-      &:hover {
-        transform: scale(1.05);
+      &.has-img {
+        background: transparent;
+        border-color: var(--border-light);
+      }
+
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
 
@@ -248,10 +254,8 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
       position: absolute;
       top: calc(100% + 12px);
       right: 0;
-      background: white;
-      border: 1px solid #f1f5f9;
-      border-radius: 14px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      background: var(--bg-main);
+      border: 1px solid var(--border-light);
       width: 220px;
       z-index: 1000;
       padding: 6px;
@@ -259,7 +263,7 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
 
       hr {
         border: none;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid var(--border-light);
         margin: 4px 0;
       }
     }
@@ -267,7 +271,7 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
     @keyframes dropdownSlide {
       from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(6px);
       }
       to {
         opacity: 1;
@@ -282,18 +286,17 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
 
       .user-email {
         font-size: 0.8rem;
-        color: #64748b;
+        color: var(--text-muted);
         word-break: break-all;
       }
     }
 
     .dropdown-item {
       display: block;
-      padding: 10px 12px;
-      color: #334155;
+      padding: 8px 12px;
+      color: var(--text-main);
       font-size: 0.85rem;
       font-weight: 500;
-      border-radius: 8px;
       transition: background-color 0.2s;
       width: 100%;
       text-align: left;
@@ -302,12 +305,12 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
       cursor: pointer;
 
       &:hover {
-        background-color: #f1f5f9;
+        background-color: var(--bg-sub);
       }
     }
 
     .logout-btn {
-      color: #ef4444;
+      color: #991b1b;
 
       &:hover {
         background-color: #fef2f2;
@@ -319,17 +322,29 @@ export class ToolbarComponent {
   cartService = inject(CartService);
   authService = inject(AuthService);
   isUserMenuOpen = signal(false);
+  
+  private elementRef = inject(ElementRef);
 
   openCart() {
     this.cartService.isDrawerOpen.set(true);
   }
 
-  toggleUserMenu() {
+  toggleUserMenu(event: Event) {
+    event.stopPropagation();
     this.isUserMenuOpen.update((val) => !val);
   }
 
   closeUserMenu() {
     this.isUserMenuOpen.set(false);
+  }
+
+  preventClose(event: Event) {
+    event.stopPropagation();
+  }
+
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.closeUserMenu();
   }
 
   logout() {
@@ -343,3 +358,4 @@ export class ToolbarComponent {
     return email.substring(0, 2).toUpperCase();
   }
 }
+

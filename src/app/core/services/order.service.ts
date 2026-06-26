@@ -4,11 +4,10 @@ import {
   collection,
   collectionData,
   Firestore,
-  orderBy,
   query,
   where,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Order } from '../models/order.model';
 
 @Injectable({
@@ -29,10 +28,25 @@ export class OrderService {
     const ordersCol = collection(this.firestore, 'orders');
     const q = query(
       ordersCol,
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     );
-    // return collectionData with idField option so we have the order IDs
-    return collectionData(q, { idField: 'id' }) as Observable<Order[]>;
+    // return collectionData with idField option so we have the order IDs, sorted in client
+    return (collectionData(q, { idField: 'id' }) as Observable<Order[]>).pipe(
+      map(orders => {
+        return orders.sort((a, b) => {
+          const getMs = (dateVal: any): number => {
+            if (!dateVal) return 0;
+            if (typeof dateVal.toDate === 'function') {
+              return dateVal.toDate().getTime();
+            }
+            if (dateVal.seconds !== undefined) {
+              return dateVal.seconds * 1000;
+            }
+            return new Date(dateVal).getTime();
+          };
+          return getMs(b.createdAt) - getMs(a.createdAt);
+        });
+      })
+    );
   }
 }

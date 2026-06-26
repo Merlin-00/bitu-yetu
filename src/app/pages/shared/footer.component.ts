@@ -5,62 +5,96 @@ import { RouterLink } from '@angular/router';
   selector: 'app-footer',
   imports: [RouterLink],
   template: `
-    <footer>
-      <div class="footer-container">
+    <footer class="footer">
+      <div class="footer-container max-width">
         <div class="left-container">
           <div>
-            <p><b>PRODUITS</b></p>
-            <a routerLink="/products/electronics">Electroniques</a>
-            <a routerLink="/products/jewelery">Bijoux</a>
-            <a routerLink="/products/men's clothing">Vetements pour hommes</a>
-            <a routerLink="/products/women:s clothing">Vetements pour femmes</a>
+            <p class="footer-title"><b>PRODUITS</b></p>
+            <a routerLink="/products/electronics" class="footer-link">Électroniques</a>
+            <a routerLink="/products/jewelery" class="footer-link">Bijoux</a>
+            <a routerLink="/products/men's clothing" class="footer-link">Vêtements pour hommes</a>
+            <a routerLink="/products/women's clothing" class="footer-link">Vêtements pour femmes</a>
           </div>
           <div>
-            <p><b>LIENS</b></p>
-            <a
-              href="https://x.com/Merlin_Lubambo?t=w-wI13_Zlg9XkQ-MNZJJFw&s=08"
-              target="_blank"
-              >Merlin X</a
-            >
-            <a href="https://github.com/Merlin-00/Merlin-00.git" target="_blank"
-              >Merlin github</a
-            >
-            <a
-              href="https://www.linkedin.com/in/merlin-lubambo-97b2b6336?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
-              target="_blank"
-              >Merlin linkedln</a
-            >
+            <p class="footer-title"><b>AIDE & CONTACT</b></p>
+            <a href="#" class="footer-link">Service client</a>
+            <a href="#" class="footer-link">Conditions Générales de Vente</a>
+            <a href="#" class="footer-link">Politique de confidentialité</a>
+            <a href="#" class="footer-link">Mentions légales</a>
           </div>
         </div>
-        <p>
-          <b>bitu-yetu {{ date.getFullYear() }}</b
-          ><br />
-          Developpé par Merlin Lubambo, ref. Amani Bisimwa | Malakisi
-        </p>
+        <div class="right-container">
+          <p class="footer-brand"><b>bitu-yetu</b></p>
+          <p class="footer-copyright">
+            &copy; {{ date.getFullYear() }} bitu-yetu. Tous droits réservés.<br />
+            Votre destination d'exception pour vos articles préférés au quotidien.
+          </p>
+        </div>
       </div>
     </footer>
   `,
   styles: `
-  footer{
-    background: #e4e4e4;
-  }
-  .footer-container{
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    padding: 2rem;
-    flex-wrap: wrap;
-  }
-  .left-container{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3rem;
-
-    a{
-      display: block;
-      margin: 0.5rem 0;
+    .footer {
+      background: var(--bg-sub);
+      border-top: 1px solid var(--border-light);
+      padding: 3rem 1rem;
+      color: var(--text-main);
     }
-  }
+    
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+    }
+    
+    .left-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4rem;
+    }
+
+    .footer-title {
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+    
+    .footer-link {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0.5rem 0;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--text-main);
+        opacity: 1;
+      }
+    }
+
+    .right-container {
+      text-align: left;
+      @media (min-width: 768px) {
+        text-align: right;
+      }
+    }
+
+    .footer-brand {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .footer-copyright {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
   `,
 })
 export class FooterComponent {
