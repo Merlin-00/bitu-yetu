@@ -28,6 +28,47 @@ import { CartService } from '../../core/services/cart.service';
     background: grey;
     opacity: 0.5;
   }
+
+  .quantity-container{
+    display: flex;
+    align-items: center;
+    space-between: 1rem;
+    gap: 0.5rem;
+  }
+
+  .panier {
+      background: var(--primary);
+      color: var(--bg-main) !important;
+      border: 1px solid var(--border-light);
+      padding: 0.8rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+      }
+    }
+    .quant {
+      background: var(--primary);
+      color: var(--bg-main) !important;
+      border: 1px solid var(--border-light);
+      border-radius: 2rem;
+      padding: 0.8rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+      }
+    }
   `,
 })
 export default class ProductComponent implements OnInit, OnDestroy {

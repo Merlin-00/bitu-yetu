@@ -15,12 +15,12 @@
             </p>
             <div class="quantity-container">
                 <span>Quantité: </span>
-                <button [disabled]='productQty() === 1' (click)="qtyHandling('minus')"> -
+                <button [disabled]='productQty() === 1' (click)="qtyHandling('minus')" class="quant"> -
                 </button>
                 <span>
                     <b>{{productQty()}}</b>
                 </span>
-                <button (click)="qtyHandling('add')" [disabled]="productQty() === 5"> +
+                <button (click)="qtyHandling('add')" [disabled]="productQty() === 5" class="quant"> +
                 </button>
             </div>
             <hr>
@@ -28,7 +28,7 @@
                 <b>Total: ${{product.price! *productQty()}}
                 </b>
             </span>
-            <button (click)="addToCard(product)">Ajouter au panier</button>
+            <button (click)="addToCard(product)" class="panier">Ajouter au panier</button>
             <br>
             <hr>
             <p>{{product.description}}</p>
