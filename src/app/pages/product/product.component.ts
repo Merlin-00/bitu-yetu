@@ -6,37 +6,70 @@ import { ApiService } from '../../core/services/api.service';
 import { Title } from '@angular/platform-browser';
 import { ProductListComponent } from '../products/product-list/product-list.component';
 import { CartService } from '../../core/services/cart.service';
+import { ProductSkeletonComponent } from '../shared/skeletons/product-skeleton/product-skeleton.component';
 
 @Component({
   selector: 'app-product',
-  imports: [ProductListComponent],
+  imports: [ProductListComponent, ProductSkeletonComponent],
   templateUrl: './product.component.html',
   styles: `
-  .produit-container{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin: 2rem auto !important;
-    img{
-      width: 50%;
+    .produit-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin: 2rem auto !important;
+      img {
+        width: 50%;
+      }
+      .product-info {
+        width: 40%;
+      }
     }
-    .product-info{
-      width: 40%;
+    button:disabled {
+      background: grey;
+      opacity: 0.5;
     }
-  }
-  button:disabled{
-    background: grey;
-    opacity: 0.5;
-  }
+    .quantity-container {
+      display: flex;
+      align-items: center;
+    }
 
-  .quantity-container{
-    display: flex;
-    align-items: center;
-    space-between: 1rem;
-    gap: 0.5rem;
-  }
+    .label {
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-  .panier {
+    .quantity-box {
+      width: 110px;
+      height: 40px;
+      background: #efefef;
+      border-radius: 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 4px;
+    }
+
+    .quant {
+      width: 32px;
+      height: 32px;
+      color: var(--bg-main);
+      border: none;
+      border-radius: 50%;
+      background: var(--primary);
+
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .qty-value {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .panier {
       background: var(--primary);
       color: var(--bg-main) !important;
       border: 1px solid var(--border-light);
@@ -52,21 +85,32 @@ import { CartService } from '../../core/services/cart.service';
         border-color: var(--primary-hover);
       }
     }
-    .quant {
-      background: var(--primary);
-      color: var(--bg-main) !important;
-      border: 1px solid var(--border-light);
-      border-radius: 2rem;
-      padding: 0.8rem;
-      font-weight: 600;
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all 0.2s;
+    /* ================= Responsive ================= */
 
-      &:hover {
-        background: var(--primary-hover);
-        border-color: var(--primary-hover);
+    @media (max-width: 768px) {
+      .produit-container {
+        flex-direction: column;
+        gap: 2rem;
+
+        img {
+          width: 100%;
+          max-width: 350px;
+          margin: 0 auto;
+          display: block;
+        }
+
+        .product-info {
+          width: 100%;
+        }
+      }
+
+      .quantity-container {
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .panier {
+        width: 100%;
       }
     }
   `,

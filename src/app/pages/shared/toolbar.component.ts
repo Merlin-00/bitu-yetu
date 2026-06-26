@@ -1,4 +1,10 @@
-import { Component, ElementRef, HostListener, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -18,9 +24,43 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
           </a>
         </div>
 
-        <div class="search-side">
+        <div class="search-side desktop-search">
           <app-search-bar />
         </div>
+
+        <button
+          class="mobile-search-btn"
+          (click)="toggleMobileSearch()"
+          aria-label="Rechercher"
+        >
+          @if (!showMobileSearch()) {
+            <!-- Icône Recherche -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+              fill="#111111"
+            >
+              <path
+                d="M784-120 532-372q-30 24-70.5 38T380-320q-116 0-198-82t-82-198q0-116 82-198t198-82q116 0 198 82t82 198q0 40-14 80.5T604-444l252 252-72 72ZM380-400q83 0 141.5-58.5T580-600q0-83-58.5-141.5T380-800q-83 0-141.5 58.5T180-600q0 83 58.5 141.5T380-400Z"
+              />
+            </svg>
+          } @else {
+            <!-- Icône Fermer -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+              fill="#111111"
+            >
+              <path
+                d="m251.33-189.33-62-62L418-480 189.33-708.67l62-62L480-542l228.67-228.67 62 62L542-480l228.67 228.67-62 62L480-418 251.33-189.33Z"
+              />
+            </svg>
+          }
+        </button>
 
         <div class="actions-side">
           <!-- Cart Icon -->
@@ -50,21 +90,34 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
               <div class="auth-skeleton"></div>
             } @else if (authService.currentUser()) {
               <div class="user-menu-container" (click)="toggleUserMenu($event)">
-                <div class="user-avatar" [class.has-img]="authService.currentUser()?.photoURL">
+                <div
+                  class="user-avatar"
+                  [class.has-img]="authService.currentUser()?.photoURL"
+                >
                   @if (authService.currentUser()?.photoURL) {
-                    <img [src]="authService.currentUser()?.photoURL" alt="avatar" class="avatar-img" />
+                    <img
+                      [src]="authService.currentUser()?.photoURL"
+                      alt="avatar"
+                      class="avatar-img"
+                    />
                   } @else {
                     {{ getUserInitials() }}
                   }
                 </div>
-                
+
                 @if (isUserMenuOpen()) {
                   <div class="user-dropdown" (click)="preventClose($event)">
                     <div class="dropdown-header">
-                      <span class="user-email">{{ authService.currentUser()?.email }}</span>
+                      <span class="user-email">{{
+                        authService.currentUser()?.email
+                      }}</span>
                     </div>
                     <hr />
-                    <a routerLink="/orders" class="dropdown-item" (click)="closeUserMenu()">
+                    <a
+                      routerLink="/orders"
+                      class="dropdown-item"
+                      (click)="closeUserMenu()"
+                    >
                       📦 Mes commandes
                     </a>
                     <hr />
@@ -81,7 +134,13 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
         </div>
       </div>
     </header>
-
+    @if (showMobileSearch()) {
+      <div class="mobile-search">
+        <div class="max-width">
+          <app-search-bar />
+        </div>
+      </div>
+    }
     <!-- Global Cart Drawer Drawer -->
     <app-cart-drawer />
   `,
@@ -112,7 +171,7 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        
+
         .logo-icon {
           font-size: 1.3rem;
         }
@@ -199,9 +258,15 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
     }
 
     @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
+      0% {
+        opacity: 0.6;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.6;
+      }
     }
 
     .login-button {
@@ -316,14 +381,68 @@ import { CartDrawerComponent } from './cart-drawer/cart-drawer.component';
         background-color: #fef2f2;
       }
     }
+
+    .mobile-search-btn {
+      display: none;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-search {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-main);
+      animation: slideDown 0.25s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .desktop-search {
+        display: none;
+      }
+
+      .mobile-search-btn {
+        display: flex;
+      }
+
+      .toolbar {
+        gap: 0.5rem;
+      }
+
+      .cart-label {
+        display: none;
+      }
+    }
   `,
 })
 export class ToolbarComponent {
   cartService = inject(CartService);
   authService = inject(AuthService);
   isUserMenuOpen = signal(false);
-  
+  showMobileSearch = signal(false);
   private elementRef = inject(ElementRef);
+
+  toggleMobileSearch() {
+    this.showMobileSearch.update((value) => !value);
+  }
+
+  closeMobileSearch() {
+    this.showMobileSearch.set(false);
+  }
 
   openCart() {
     this.cartService.isDrawerOpen.set(true);
@@ -358,4 +477,3 @@ export class ToolbarComponent {
     return email.substring(0, 2).toUpperCase();
   }
 }
-

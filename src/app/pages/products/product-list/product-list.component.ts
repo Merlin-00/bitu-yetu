@@ -11,10 +11,11 @@ import { ApiService } from '../../../core/services/api.service';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
+import { CartSkeletonComponent } from "../../shared/skeletons/cart-skeleton/cart-skeleton.component";
 
 @Component({
   selector: 'app-product-list',
-  imports: [RouterLink],
+  imports: [RouterLink, CartSkeletonComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
 })
