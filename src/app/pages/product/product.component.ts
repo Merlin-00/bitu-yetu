@@ -4,8 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription, switchMap } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { Title } from '@angular/platform-browser';
-import { unsubscribe } from 'diagnostics_channel';
 import { ProductListComponent } from '../products/product-list/product-list.component';
+import { CartService } from '../../core/services/cart.service';
 
 @Component({
   selector: 'app-product',
@@ -34,6 +34,7 @@ export default class ProductComponent implements OnInit, OnDestroy {
   product?: Product;
   route = inject(ActivatedRoute);
   api = inject(ApiService);
+  cartService = inject(CartService);
   loading = signal(true);
   title = inject(Title);
   routeSub?: Subscription;
@@ -58,7 +59,7 @@ export default class ProductComponent implements OnInit, OnDestroy {
   }
 
   addToCard(product: Product) {
-    this.api.countProduct.update((value) => value + this.productQty());
+    this.cartService.addToCart(product, this.productQty());
     this.productQty.set(1);
   }
   ngOnDestroy(): void {
